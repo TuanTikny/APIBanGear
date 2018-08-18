@@ -99,8 +99,6 @@ exports.updateUserInfor = function(
 };
 
 // select and login
-//SELECT * FROM `users` WHERE email like 'buianhtuan' and `password` like '222222'
-
 exports.loginUser = function(email, pasword, callbackLogin) {
   connectdb();
   var sql =

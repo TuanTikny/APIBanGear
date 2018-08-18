@@ -3,6 +3,7 @@ var bodyParser = require("body-parser");
 var md5 = require("md5");
 var productconnect = require("./Database/products");
 var userconnect = require("./Database/users");
+var oderconnect = require("./Database/oders");
 
 var app = express();
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
@@ -177,17 +178,45 @@ app.post("/updateQuatity", urlencodedParser, function(req, res) {
     if (resultQuery === 0) {
       var resultNotInsert = {
         status: false,
-        ketqua: "Cập nhật số lượng sản phẩm thất bại"
+        ketqua: "Cap nhat so luong that bai"
       };
       res.json(resultNotInsert);
     } else {
       var resultOK = {
         status: true,
-        ketqua: "Cập nhật số lượng Success"
+        ketqua: "Cap nhat so luong Success"
       };
       res.json(resultOK);
     }
   });
+});
+
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>> Phần Order
+
+//http://localhost:3000/addOder
+app.post("/addOder", urlencodedParser, function(req, res) {
+  var _jsonproducts = req.body.jsonproducts;
+  var _jsonuser = req.body.jsonuser;
+  var _totalprice = req.body.totalprice;
+  var _dateoder = req.body.dateoder;
+  var _status = req.body.status;
+
+  oderconnect.addOder(
+    _jsonproducts,
+    _jsonuser,
+    _totalprice,
+    _dateoder,
+    _status,
+    function(resultQuery) {
+      if (resultQuery === 0) {
+        var resultNotInsert = { status: false, ketqua: "InsertOder That Bai" };
+        res.json(resultNotInsert);
+      } else {
+        var resultOK = { status: true, ketqua: "InsertOder Thanh Cong" };
+        res.json(resultOK);
+      }
+    }
+  );
 });
 
 app.listen(3000);
