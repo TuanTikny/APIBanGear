@@ -70,6 +70,20 @@ exports.updatePass = function(email, passold, passnew, callbackUpdate) {
   });
 };
 
+// chức năng khôi phục mật khẩu
+exports.forgotPass = function(email, callbackForgot) {
+  connectdb();
+  var sql = "SELECT `password` FROM `users` WHERE email like '" + email + "'";
+  con.query(sql, function(err, result) {
+    // console.log(result);
+    if (result != "") {
+      callbackForgot(result);
+    } else {
+      callbackForgot(0);
+    }
+  });
+};
+
 // Update User infor
 exports.updateUserInfor = function(
   id,
