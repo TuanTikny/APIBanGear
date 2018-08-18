@@ -226,4 +226,26 @@ app.get("/getOders", function(req, res) {
   });
 });
 
+// http://localhost:3000/updateStatus
+app.post("/updateStatus", urlencodedParser, function(req, res) {
+  var _id = req.body.id;
+  var _status = req.body.status;
+
+  oderconnect.updateStatus(_id, _status, function(resultQuery) {
+    if (resultQuery === 0) {
+      var resultNotInsert = {
+        status: false,
+        ketqua: "Cap nhat status Fail"
+      };
+      res.json(resultNotInsert);
+    } else {
+      var resultOK = {
+        status: true,
+        ketqua: "Cap nhat status Success"
+      };
+      res.json(resultOK);
+    }
+  });
+});
+
 app.listen(3000);

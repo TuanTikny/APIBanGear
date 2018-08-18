@@ -63,15 +63,20 @@ exports.getOders = function(callbackSelectOder) {
 };
 
 // Update Status for Oder
-exports.updateStatus = function(callbackQuery) {
+exports.updateStatus = function(id, status, callbackUpdateStatus) {
   connectdb();
-  var sql = "";
+  var sql =
+    "UPDATE `oders` SET `status` = '" +
+    status +
+    "' WHERE `oders`.`id` = " +
+    id +
+    "";
   con.query(sql, function(err, results) {
     // console.log(results);
     if (results.affectedRows === 0) {
-      callbackUpdateQuatity(0);
+      callbackUpdateStatus(0);
     } else {
-      callbackUpdateQuatity(results);
+      callbackUpdateStatus(results);
     }
   });
 };
