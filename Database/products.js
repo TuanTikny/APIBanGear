@@ -20,7 +20,8 @@ var connectdb = function() {
 // query tất cả danh sách sản phẩm
 exports.getproducts = function(callbackQuery) {
   connectdb();
-  con.query("SELECT * FROM `products`", function(err, results, fieds) {
+  var sql = "SELECT * FROM `products`";
+  con.query(sql, function(err, results, fieds) {
     if (!err) {
       // trả về array sản phẩm
       callbackQuery(results);

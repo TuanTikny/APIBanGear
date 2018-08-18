@@ -219,4 +219,11 @@ app.post("/addOder", urlencodedParser, function(req, res) {
   );
 });
 
+// http://localhost:3000/getOders
+app.get("/getOders", function(req, res) {
+  oderconnect.getOders(function(resultQuery) {
+    res.json(resultQuery);
+  });
+});
+
 app.listen(3000);

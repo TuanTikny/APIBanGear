@@ -17,7 +17,7 @@ var connectdb = function() {
   });
 };
 
-//them mot order
+//add 1 order
 exports.addOder = function(
   jsonproducts,
   jsonuser,
@@ -44,6 +44,34 @@ exports.addOder = function(
       callbackInsert(results);
     } else {
       console.log("Error" + err);
+    }
+  });
+};
+
+// Select Oders
+exports.getOders = function(callbackSelectOder) {
+  connectdb();
+  var sql = "SELECT * FROM `oders`";
+  con.query(sql, function(err, results, fieds) {
+    if (!err) {
+      // trả về array oder
+      callbackSelectOder(results);
+    } else {
+      console.log("ErrorGetProduct" + err);
+    }
+  });
+};
+
+// Update Status for Oder
+exports.updateStatus = function(callbackQuery) {
+  connectdb();
+  var sql = "";
+  con.query(sql, function(err, results) {
+    // console.log(results);
+    if (results.affectedRows === 0) {
+      callbackUpdateQuatity(0);
+    } else {
+      callbackUpdateQuatity(results);
     }
   });
 };
