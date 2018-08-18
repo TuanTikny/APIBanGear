@@ -155,8 +155,8 @@ app.get("/Listproducts", function(req, res) {
 
 // http://localhost:3000/Findproducts?name=Chu
 app.get("/Findproducts", function(req, res) {
-  var name = req.query.name;
-  productconnect.findProducts(name, function(resultQuery) {
+  var _name = req.query.name;
+  productconnect.findProducts(_name, function(resultQuery) {
     if (resultQuery.lengh === 0) {
       // trả về không có tên sản phẩm này
       var resultNotFind = { status: false, notarr: [] };
@@ -169,6 +169,25 @@ app.get("/Findproducts", function(req, res) {
   });
 });
 
-//
+//http://localhost:3000/updateQuatity
+app.post("/updateQuatity", urlencodedParser, function(req, res) {
+  var _id = req.body.id;
+  var _quatiy = req.body.quatity;
+  productconnect.updateQuatity(_id, _quatiy, function(resultQuery) {
+    if (resultQuery === 0) {
+      var resultNotInsert = {
+        status: false,
+        ketqua: "Cập nhật số lượng sản phẩm thất bại"
+      };
+      res.json(resultNotInsert);
+    } else {
+      var resultOK = {
+        status: true,
+        ketqua: "Cập nhật số lượng Success"
+      };
+      res.json(resultOK);
+    }
+  });
+});
 
 app.listen(3000);
