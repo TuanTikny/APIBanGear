@@ -22,10 +22,10 @@ exports.checkUser = function(email, callbackCheck) {
   connectdb();
   var sql = "SELECT * FROM `users` WHERE `email` = '" + email + "'";
   con.query(sql, function(err, result) {
-    if (!err) {
+    if (result != "") {
       callbackCheck(result);
     } else {
-      callbackCheck(result[0]);
+      callbackCheck(0);
     }
   });
 };
@@ -70,5 +70,51 @@ exports.updatePass = function(email, passold, passnew, callbackUpdate) {
   });
 };
 
+// Update User infor
+exports.updateUserInfor = function(
+  id,
+  name,
+  birthday,
+  phone,
+  callbackUpdateInfor
+) {
+  connectdb();
+  var sql =
+    "UPDATE `users` SET `name` = '" +
+    name +
+    "', `birthday` = '" +
+    birthday +
+    "', `phone` = '" +
+    phone +
+    "' WHERE `users`.`id` = " +
+    id +
+    "";
+  con.query(sql, function(err, results, fieds) {
+    if (results.affectedRows === 0) {
+      callbackUpdateInfor(0);
+    } else {
+      callbackUpdateInfor(results);
+    }
+  });
+};
+
 // select and login
 //SELECT * FROM `users` WHERE email like 'buianhtuan' and `password` like '222222'
+
+exports.loginUser = function(email, pasword, callbackLogin) {
+  connectdb();
+  var sql =
+    "SELECT * FROM `users` WHERE email like '" +
+    email +
+    "' and `password` like '" +
+    pasword +
+    "'";
+  con.query(sql, function(err, result) {
+    // console.log(result);
+    if (result != "") {
+      callbackLogin(result);
+    } else {
+      callbackLogin(0);
+    }
+  });
+};

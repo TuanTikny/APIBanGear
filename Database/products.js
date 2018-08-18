@@ -30,18 +30,30 @@ exports.getproducts = function(callbackQuery) {
   });
 };
 
-
 // query tìm sản phẩm theo tên
 exports.findProducts = function(name, callbackFind) {
   connectdb();
-  con.query(
-    "SELECT * FROM `products` WHERE `name` LIKE '%" + name + "%'",
-    function(err, results, fieds) {
-      if (!err) {
-        callbackFind(results);
-      } else {
-        console.log("ErrorFindProduct" + err);
-      }
+  var sql = "SELECT * FROM `products` WHERE `name` LIKE '%" + name + "%'";
+  con.query(sql, function(err, results, fieds) {
+    if (!err) {
+      callbackFind(results);
+    } else {
+      console.log("ErrorFindProduct" + err);
     }
-  );
+  });
+};
+
+// update quatity when user buy
+exports.updateQuatity = function(id, quatity, callbackUpdateQuatity) {
+  connectdb();
+
+  var sql = "";
+
+  con.query(sql, function(err, results) {
+    if (results.affectedRows === 0) {
+      callbackUpdateQuatity(0);
+    } else {
+      callbackUpdateQuatity(results);
+    }
+  });
 };

@@ -14,13 +14,13 @@ app.post("/addUser", urlencodedParser, function(req, res) {
   var _email = req.body.email;
   var _pass = md5(req.body.pass);
   userconnect.checkUser(_email, function(resultQuery) {
-    try {
-      if (resultQuery[0].email === _email) {
-        var result = { status: false, ketqua: "Email Da ton tai" };
-        res.json(result);
-      }
-    } catch (error) {
-      if (_email === undefined || req.body.pass === undefined) {
+    if (resultQuery === 0) {
+      if (
+        _email === "" ||
+        _email === undefined ||
+        req.body.pass === "" ||
+        req.body.pass === undefined
+      ) {
         var resultNotInsert = {
           status: false,
           ketqua: "Insert ERROR Trường bị rỗng"
@@ -39,8 +39,47 @@ app.post("/addUser", urlencodedParser, function(req, res) {
           }
         });
       }
+    } else {
+      var result = { status: false, ketqua: "Email Da ton tai" };
+      res.json(result);
     }
   });
+});
+
+//http://localhost:3000/loginUser
+app.post("/loginUser", urlencodedParser, function(req, res) {
+  var _email = req.body.email;
+  var _pass = md5(req.body.pass);
+  if (
+    _email === "" ||
+    _email === undefined ||
+    req.body.pass === "" ||
+    req.body.pass === undefined
+  ) {
+    var resultNotInsert = {
+      status: false,
+      ketqua: "Insert ERROR Trường bị rỗng"
+    };
+    //   console.log(resultNotInsert);
+    res.send(resultNotInsert);
+  } else {
+    userconnect.loginUser(_email, _pass, function(resultQuery) {
+      if (resultQuery === 0) {
+        var resultNotInsert = { status: false, ketqua: "Login Fail" };
+        res.json(resultNotInsert);
+      } else {
+        var inforUser = {
+          id: resultQuery[0].id,
+          email: resultQuery[0].email,
+          name: resultQuery[0].name,
+          birthday: resultQuery[0].birthday,
+          phone: resultQuery[0].phone
+        };
+        var resultOK = { status: true, inforUser: inforUser };
+        res.json(resultOK);
+      }
+    });
+  }
 });
 
 // http://localhost:3000/updatePass
@@ -50,8 +89,11 @@ app.post("/updatePass", urlencodedParser, function(req, res) {
   var _newpass = md5(req.body.newpass);
 
   if (
+    _email === "" ||
     _email === undefined ||
+    req.body.oldpass === "" ||
     req.body.oldpass === undefined ||
+    req.body.newpass === "" ||
     req.body.newpass === undefined
   ) {
     var resultNotInsert = {
@@ -64,6 +106,34 @@ app.post("/updatePass", urlencodedParser, function(req, res) {
     userconnect.updatePass(_email, _oldpass, _newpass, function(resultQuery) {
       //console.log(resultQuery.affectedRows);
       if (resultQuery.affectedRows === 0) {
+        var resultNotInsert = { status: false, ketqua: "Update That Bai" };
+        res.json(resultNotInsert);
+      } else {
+        var resultOK = { status: true, ketqua: "Update Thanh Cong" };
+        res.json(resultOK);
+      }
+    });
+  }
+});
+
+// http://localhost:3000/updateUserInfor
+app.post("/updateUserInfor", urlencodedParser, function(req, res) {
+  var _id = req.body.id;
+  var _name = req.body.name;
+  var _birthday = req.body.birthday;
+  var _phone = req.body.phone;
+
+  if (_phone === "" || _phone === undefined) {
+    var resultNotInsert = {
+      status: false,
+      ketqua: "Số điện thoại là bắt buộc "
+    };
+    res.send(resultNotInsert);
+  } else {
+    userconnect.updateUserInfor(_id, _name, _birthday, _phone, function(
+      resultQuery
+    ) {
+      if (resultQuery === 0) {
         var resultNotInsert = { status: false, ketqua: "Update That Bai" };
         res.json(resultNotInsert);
       } else {
@@ -98,5 +168,7 @@ app.get("/Findproducts", function(req, res) {
     }
   });
 });
+
+//
 
 app.listen(3000);
