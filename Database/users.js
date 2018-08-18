@@ -20,7 +20,7 @@ var connectdb = function() {
 // check sự tồn tại của email
 exports.checkUser = function(email, callbackCheck) {
   connectdb();
-  var sql = "SELECT count(*) FROM `users` WHERE `email` LIKE '" + email + "'";
+  var sql = "SELECT * FROM `users` WHERE `email` = '" + email + "'";
   con.query(sql, function(err, result) {
     if (!err) {
       callbackCheck(result);
@@ -50,7 +50,7 @@ exports.insertUser = function(email, pass, callbackInsert) {
 };
 
 // update pass
-exports.updatePass = function(email, passold, passnew, callbackInsert) {
+exports.updatePass = function(email, passold, passnew, callbackUpdate) {
   connectdb();
   var sql =
     "UPDATE `users` SET `password` = '" +
@@ -60,11 +60,14 @@ exports.updatePass = function(email, passold, passnew, callbackInsert) {
     "' and `password`='" +
     passold +
     "';";
-  con.query(sql, function(err, results) {
+  con.query(sql, function(err, results, fieds) {
     if (!err) {
-      callbackInsert(results);
+      callbackUpdate(results);
+      console.log(results);
     } else {
       console.log("Error" + err);
     }
   });
 };
+
+// select and login

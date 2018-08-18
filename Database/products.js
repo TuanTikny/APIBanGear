@@ -30,7 +30,7 @@ exports.getproducts = function(callbackQuery) {
   });
 };
 
-// tìm kiếm
+
 // query tìm sản phẩm theo tên
 exports.findProducts = function(name, callbackFind) {
   connectdb();
