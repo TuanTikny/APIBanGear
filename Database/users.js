@@ -71,3 +71,4 @@ exports.updatePass = function(email, passold, passnew, callbackUpdate) {
 };
 
 // select and login
+//SELECT * FROM `users` WHERE email like 'buianhtuan' and `password` like '222222'
