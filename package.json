@@ -1,7 +1,7 @@
 {
-  "name": "bangiayapi",
+  "name": "bangearapi",
   "version": "1.0.0",
-  "description": "api tra ve cho ung dung ban giay",
+  "description": "api tra ve cho ung dung ban gear",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
