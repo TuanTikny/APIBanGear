@@ -33,7 +33,6 @@ exports.checkUser = function(email, callbackCheck) {
 // sign up mail with pass
 exports.insertUser = function(email, pass, callbackInsert) {
   connectdb();
-
   var sql =
     "INSERT INTO `users` (`id`, `email`, `password`, `name`, `roles`, `birthday`, `phone`) VALUES (NULL, '" +
     email +
@@ -70,6 +69,20 @@ exports.updatePass = function(email, passold, passnew, callbackUpdate) {
   });
 };
 
+// chức năng khôi phục mật khẩu
+exports.forgotPass = function(email, callbackForgot) {
+  connectdb();
+  var sql = "SELECT `password` FROM `users` WHERE email like '" + email + "'";
+  con.query(sql, function(err, result) {
+    // console.log(result);
+    if (result != "") {
+      callbackForgot(result);
+    } else {
+      callbackForgot(0);
+    }
+  });
+};
+
 // Update User infor
 exports.updateUserInfor = function(
   id,
@@ -99,8 +112,6 @@ exports.updateUserInfor = function(
 };
 
 // select and login
-//SELECT * FROM `users` WHERE email like 'buianhtuan' and `password` like '222222'
-
 exports.loginUser = function(email, pasword, callbackLogin) {
   connectdb();
   var sql =

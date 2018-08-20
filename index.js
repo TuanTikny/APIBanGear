@@ -1,16 +1,18 @@
 var express = require("express");
 var bodyParser = require("body-parser");
 var md5 = require("md5");
+var nodemailer = require("nodemailer");
 var productconnect = require("./Database/products");
 var userconnect = require("./Database/users");
+var oderconnect = require("./Database/oders");
 
 var app = express();
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Phần người dùng
 
-// http://localhost:3000/addUser
-app.post("/addUser", urlencodedParser, function(req, res) {
+// http://localhost:3000/gearapi/addUser
+app.post("/gearapi/addUser", urlencodedParser, function(req, res) {
   var _email = req.body.email;
   var _pass = md5(req.body.pass);
   userconnect.checkUser(_email, function(resultQuery) {
@@ -31,25 +33,32 @@ app.post("/addUser", urlencodedParser, function(req, res) {
         userconnect.insertUser(_email, _pass, function(resultQuery) {
           // console.log(resultQuery);
           if (resultQuery === 0) {
-            var resultNotInsert = { status: false, ketqua: "Insert That Bai" };
+            var resultNotInsert = {
+              status: false,
+              ketqua: "Đăng Ký Thất Bại! Vui lòng thử lại"
+            };
             res.json(resultNotInsert);
           } else {
-            var resultOK = { status: true, ketqua: "Insert Thanh Cong" };
+            var resultOK = {
+              status: true,
+              ketqua: "Đăng ký tài khoản thành công"
+            };
             res.json(resultOK);
           }
         });
       }
     } else {
-      var result = { status: false, ketqua: "Email Da ton tai" };
+      var result = { status: false, ketqua: "Email Tài Khoản Đã Tồn Tại" };
       res.json(result);
     }
   });
 });
 
-//http://localhost:3000/loginUser
-app.post("/loginUser", urlencodedParser, function(req, res) {
+//http://localhost:3000/gearapi/loginUser
+app.post("/gearapi/loginUser", urlencodedParser, function(req, res) {
   var _email = req.body.email;
   var _pass = md5(req.body.pass);
+  console.log(_email + " : " + _pass);
   if (
     _email === "" ||
     _email === undefined ||
@@ -82,8 +91,75 @@ app.post("/loginUser", urlencodedParser, function(req, res) {
   }
 });
 
-// http://localhost:3000/updatePass
-app.post("/updatePass", urlencodedParser, function(req, res) {
+//http://localhost:3000/gearapi/forgotPass
+app.post("/gearapi/forgotPass", urlencodedParser, function(req, res) {
+  var _email = req.body.email;
+  var transporter = nodemailer.createTransport(
+    "smtps://buituanbapkdeveloper%40gmail.com:qitxmisndawanihz@smtp.gmail.com"
+  );
+  userconnect.forgotPass(_email, function(resultQuery) {
+    if (resultQuery === 0) {
+      var resultNotInsert = {
+        status: false,
+        ketqua: "Không Tồn Tại Email này"
+      };
+      res.json(resultNotInsert);
+    } else {
+      var resultOK = {
+        status: true,
+        ketqua: "Vui Lòng Kiểm tra Email Để Lấy Mã"
+      };
+      var mailOptions = {
+        from: '"Khôi Phục Mật Khẩu" <foo@blurdybloop.com>',
+        to: "" + _email + "",
+        subject: "MÃ KHÔI PHỤC TÀI KHOẢN",
+        text: "Mã xác thực mật khẩu",
+        html:
+          "<p>Vui lòng nhập đoạn mã sau để khôi phục mật khẩu của bạn :</p></br><b><h2>" +
+          resultQuery[0].password +
+          "</h2></b>"
+      };
+      transporter.sendMail(mailOptions, function(err, infor) {
+        if (err) {
+          return console.log(err);
+        }
+        console.log("Message sent:" + infor.response);
+        res.json(resultOK);
+      });
+    }
+  });
+});
+
+// http://localhost:3000/gearapi/updatePasswithCode
+app.post("/gearapi/updatePasswithCode", urlencodedParser, function(req, res) {
+  var _email = req.body.email;
+  var _keycode = req.body.keycode;
+  var _newpass = md5(req.body.newpass);
+  if (req.body.newpass === "" || req.body.newpass === undefined) {
+    var resultNotInsert = {
+      status: false,
+      ketqua: "Bạn Chưa Nhập Password Mới"
+    };
+    // console.log(resultNotInsert);
+    res.send(resultNotInsert);
+  } else {
+    userconnect.updatePass(_email, _keycode, _newpass, function(resultQuery) {
+      if (resultQuery.affectedRows === 0) {
+        var resultNotInsert = {
+          status: false,
+          ketqua: "Mã Xác Thực Không Chính Xác"
+        };
+        res.json(resultNotInsert);
+      } else {
+        var resultOK = { status: true, ketqua: "Cập Nhật Mật Khẩu Thành Công" };
+        res.json(resultOK);
+      }
+    });
+  }
+});
+
+// http://localhost:3000/gearapi/updatePass
+app.post("/gearapi/updatePass", urlencodedParser, function(req, res) {
   var _email = req.body.email;
   var _oldpass = md5(req.body.oldpass);
   var _newpass = md5(req.body.newpass);
@@ -116,8 +192,8 @@ app.post("/updatePass", urlencodedParser, function(req, res) {
   }
 });
 
-// http://localhost:3000/updateUserInfor
-app.post("/updateUserInfor", urlencodedParser, function(req, res) {
+// http://localhost:3000/gearapi/updateUserInfor
+app.post("/gearapi/updateUserInfor", urlencodedParser, function(req, res) {
   var _id = req.body.id;
   var _name = req.body.name;
   var _birthday = req.body.birthday;
@@ -146,17 +222,17 @@ app.post("/updateUserInfor", urlencodedParser, function(req, res) {
 
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>> Phần sản phẩm
 
-// http://localhost:3000/Listproducts
-app.get("/Listproducts", function(req, res) {
+// http://localhost:3000/gearapi/Listproducts
+app.get("/gearapi/Listproducts", function(req, res) {
   productconnect.getproducts(function(resultQuery) {
     res.json(resultQuery);
   });
 });
 
-// http://localhost:3000/Findproducts?name=Chu
-app.get("/Findproducts", function(req, res) {
-  var name = req.query.name;
-  productconnect.findProducts(name, function(resultQuery) {
+// http://localhost:3000/gearapi/Findproducts?name=Chu
+app.get("/gearapi/Findproducts", function(req, res) {
+  var _name = req.query.name;
+  productconnect.findProducts(_name, function(resultQuery) {
     if (resultQuery.lengh === 0) {
       // trả về không có tên sản phẩm này
       var resultNotFind = { status: false, notarr: [] };
@@ -169,6 +245,82 @@ app.get("/Findproducts", function(req, res) {
   });
 });
 
-//
+//http://localhost:3000/gearapi/updateQuatity
+app.post("/gearapi/updateQuatity", urlencodedParser, function(req, res) {
+  var _id = req.body.id;
+  var _quatiy = req.body.quatity;
+  productconnect.updateQuatity(_id, _quatiy, function(resultQuery) {
+    if (resultQuery === 0) {
+      var resultNotInsert = {
+        status: false,
+        ketqua: "Cap nhat so luong that bai"
+      };
+      res.json(resultNotInsert);
+    } else {
+      var resultOK = {
+        status: true,
+        ketqua: "Cap nhat so luong Success"
+      };
+      res.json(resultOK);
+    }
+  });
+});
+
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>> Phần Order
+
+//http://localhost:3000/gearapi/addOder
+app.post("/gearapi/addOder", urlencodedParser, function(req, res) {
+  var _jsonproducts = req.body.jsonproducts;
+  var _jsonuser = req.body.jsonuser;
+  var _totalprice = req.body.totalprice;
+  var _dateoder = req.body.dateoder;
+  var _status = req.body.status;
+
+  oderconnect.addOder(
+    _jsonproducts,
+    _jsonuser,
+    _totalprice,
+    _dateoder,
+    _status,
+    function(resultQuery) {
+      if (resultQuery === 0) {
+        var resultNotInsert = { status: false, ketqua: "InsertOder That Bai" };
+        res.json(resultNotInsert);
+      } else {
+        var resultOK = { status: true, ketqua: "InsertOder Thanh Cong" };
+        res.json(resultOK);
+      }
+    }
+  );
+});
+
+// http://localhost:3000/gearapi/getOders
+app.get("/gearapi/getOders", function(req, res) {
+  oderconnect.getOders(function(resultQuery) {
+    res.json(resultQuery);
+  });
+});
+
+// http://localhost:3000/gearapi/updateStatus
+app.post("/gearapi/updateStatus", urlencodedParser, function(req, res) {
+  var _id = req.body.id;
+  var _status = req.body.status;
+
+  oderconnect.updateStatus(_id, _status, function(resultQuery) {
+    if (resultQuery === 0) {
+      var resultNotInsert = {
+        status: false,
+        ketqua: "Cap nhat status Fail"
+      };
+      res.json(resultNotInsert);
+    } else {
+      var resultOK = {
+        status: true,
+        ketqua: "Cap nhat status Success"
+      };
+      res.json(resultOK);
+    }
+  });
+});
 
 app.listen(3000);
