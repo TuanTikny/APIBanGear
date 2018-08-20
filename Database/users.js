@@ -33,7 +33,6 @@ exports.checkUser = function(email, callbackCheck) {
 // sign up mail with pass
 exports.insertUser = function(email, pass, callbackInsert) {
   connectdb();
-
   var sql =
     "INSERT INTO `users` (`id`, `email`, `password`, `name`, `roles`, `birthday`, `phone`) VALUES (NULL, '" +
     email +

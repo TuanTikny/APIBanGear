@@ -33,16 +33,22 @@ app.post("/gearapi/addUser", urlencodedParser, function(req, res) {
         userconnect.insertUser(_email, _pass, function(resultQuery) {
           // console.log(resultQuery);
           if (resultQuery === 0) {
-            var resultNotInsert = { status: false, ketqua: "Insert That Bai" };
+            var resultNotInsert = {
+              status: false,
+              ketqua: "Đăng Ký Thất Bại! Vui lòng thử lại"
+            };
             res.json(resultNotInsert);
           } else {
-            var resultOK = { status: true, ketqua: "Insert Thanh Cong" };
+            var resultOK = {
+              status: true,
+              ketqua: "Đăng ký tài khoản thành công"
+            };
             res.json(resultOK);
           }
         });
       }
     } else {
-      var result = { status: false, ketqua: "Email Da ton tai" };
+      var result = { status: false, ketqua: "Email Tài Khoản Đã Tồn Tại" };
       res.json(result);
     }
   });
@@ -52,6 +58,7 @@ app.post("/gearapi/addUser", urlencodedParser, function(req, res) {
 app.post("/gearapi/loginUser", urlencodedParser, function(req, res) {
   var _email = req.body.email;
   var _pass = md5(req.body.pass);
+  console.log(_email + " : " + _pass);
   if (
     _email === "" ||
     _email === undefined ||
