@@ -182,7 +182,7 @@ app.post("/gearapi/updatePass", urlencodedParser, function(req, res) {
     userconnect.updatePass(_email, _oldpass, _newpass, function(resultQuery) {
       //console.log(resultQuery.affectedRows);
       if (resultQuery.affectedRows === 0) {
-        var resultNotInsert = { status: false, ketqua: "Update That Bai" };
+        var resultNotInsert = { status: false, ketqua: "Cập " };
         res.json(resultNotInsert);
       } else {
         var resultOK = { status: true, ketqua: "Update Thanh Cong" };
